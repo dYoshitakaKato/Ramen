@@ -40,7 +40,7 @@ server.post("/callback", (req, res) => {
 
     getJWT(jwttoken => {
         getServerToken(jwttoken, newtoken => {
-            fetchNearestRamens(token, accountId, latitude, longitude);
+            fetchNearestRamens(newtoken, accountId, latitude, longitude);
             // sendMessage(newtoken, accountId, messages);
         });
     });
