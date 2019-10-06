@@ -124,6 +124,7 @@ function fetchRamen(latitude, longitude) {
             longitude +
             "&around=1&order=distance"
     };
+    console.log(postdata.url);
     request.post(postdata, (error, response, body) => {
         if (error) {
             console.log(error);
