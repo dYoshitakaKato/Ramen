@@ -13,11 +13,11 @@ const Enumerable = require("linq");
 
 client.set("browser", "android");
 //変数
-// const APIID = process.env.APIID;
-// const SERVERID = process.env.SERVERID;
-// const CONSUMERKEY = process.env.CONSUMERKEY;
-// const PRIVATEKEY = process.env.PRIVATEKEY;
-// const BOTNO = process.env.BOTNO;
+const APIID = process.env.APIID;
+const SERVERID = process.env.SERVERID;
+const CONSUMERKEY = process.env.CONSUMERKEY;
+const PRIVATEKEY = process.env.PRIVATEKEY;
+const BOTNO = process.env.BOTNO;
 
 server.use(bodyParser.json());
 
