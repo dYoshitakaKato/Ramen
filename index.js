@@ -30,13 +30,14 @@ server.get("/", (req, res) => {
 server.post("/callback", (req, res) => {
     res.sendStatus(200);
 
-    const message = req.body.content.text;
+    const latitude = req.body.content.type.latitude;
+    const longitude = req.body.content.type.longitude;
     const roomId = req.body.source.roomId;
     const accountId = req.body.source.accountId;
 
     getJWT(jwttoken => {
         getServerToken(jwttoken, newtoken => {
-            sendMessage(newtoken, accountId, message);
+            sendMessage(newtoken, accountId, latitude, longitude);
         });
     });
 });
@@ -87,23 +88,41 @@ function getServerToken(jwttoken, callback) {
     });
 }
 
-function sendMessage(token, accountId, message) {
+function sendMessage(token, accountId, latitude, longitude) {
+    fetchRamen(latitude, longitude);
+    // const postdata = {
+    //     url:
+    //         "https://apis.worksmobile.com/" + APIID + "/message/sendMessage/v2",
+    //     headers: {
+    //         "Content-Type": "application/json;charset=UTF-8",
+    //         consumerKey: CONSUMERKEY,
+    //         Authorization: "Bearer " + token
+    //     },
+    //     json: {
+    //         botNo: Number(BOTNO),
+    //         accountId: accountId,
+    //         content: {
+    //             type: "text",
+    //             text: message
+    //         }
+    //     }
+    // };
+    // request.post(postdata, (error, response, body) => {
+    //     if (error) {
+    //         console.log(error);
+    //     }
+    //     console.log(body);
+    // });
+}
+
+function fetchRamen(latitude, longitude) {
     const postdata = {
         url:
-            "https://apis.worksmobile.com/" + APIID + "/message/sendMessage/v2",
-        headers: {
-            "Content-Type": "application/json;charset=UTF-8",
-            consumerKey: CONSUMERKEY,
-            Authorization: "Bearer " + token
-        },
-        json: {
-            botNo: Number(BOTNO),
-            accountId: accountId,
-            content: {
-                type: "text",
-                text: message
-            }
-        }
+            "https://ramendb.supleks.jp/search?lat=" +
+            latitude +
+            "&lng=" +
+            longitude +
+            "&around=1&order=distance"
     };
     request.post(postdata, (error, response, body) => {
         if (error) {
