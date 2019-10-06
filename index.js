@@ -122,13 +122,17 @@ function fetchRamen(latitude, longitude) {
             latitude +
             "&lng=" +
             longitude +
-            "&around=1&order=distance"
+            "&around=1&order=distance",
+        headers: {
+            "User-Agent":
+                "Mozilla / 5.0(iPhone; CPU iPhone OS 11_0 like Mac OS X) > > AppleWebKit / 604.1.38(KHTML, like Gecko) Version/ 11.0 Mobile/15A372 Safari/604.1"
+        }
     };
-    console.log(postdata.url);
     request.post(postdata, (error, response, body) => {
         if (error) {
             console.log(error);
         }
         console.log(body);
     });
+    console.log(postdata.url);
 }
