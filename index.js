@@ -8,13 +8,16 @@ const jwt = require("jsonwebtoken");
 const https = require("https");
 const request = require("request");
 const qs = require("querystring");
+const client = require("cheerio-httpcli");
+const Enumerable = require("linq");
 
+client.set("browser", "android");
 //変数
-const APIID = process.env.APIID;
-const SERVERID = process.env.SERVERID;
-const CONSUMERKEY = process.env.CONSUMERKEY;
-const PRIVATEKEY = process.env.PRIVATEKEY;
-const BOTNO = process.env.BOTNO;
+// const APIID = process.env.APIID;
+// const SERVERID = process.env.SERVERID;
+// const CONSUMERKEY = process.env.CONSUMERKEY;
+// const PRIVATEKEY = process.env.PRIVATEKEY;
+// const BOTNO = process.env.BOTNO;
 
 server.use(bodyParser.json());
 
@@ -37,7 +40,8 @@ server.post("/callback", (req, res) => {
 
     getJWT(jwttoken => {
         getServerToken(jwttoken, newtoken => {
-            sendMessage(newtoken, accountId, latitude, longitude);
+            fetchNearestRamens(token, accountId, latitude, longitude);
+            // sendMessage(newtoken, accountId, messages);
         });
     });
 });
@@ -88,44 +92,22 @@ function getServerToken(jwttoken, callback) {
     });
 }
 
-function sendMessage(token, accountId, latitude, longitude) {
-    fetchRamen(latitude, longitude);
-    // const postdata = {
-    //     url:
-    //         "https://apis.worksmobile.com/" + APIID + "/message/sendMessage/v2",
-    //     headers: {
-    //         "Content-Type": "application/json;charset=UTF-8",
-    //         consumerKey: CONSUMERKEY,
-    //         Authorization: "Bearer " + token
-    //     },
-    //     json: {
-    //         botNo: Number(BOTNO),
-    //         accountId: accountId,
-    //         content: {
-    //             type: "text",
-    //             text: message
-    //         }
-    //     }
-    // };
-    // request.post(postdata, (error, response, body) => {
-    //     if (error) {
-    //         console.log(error);
-    //     }
-    //     console.log(body);
-    // });
-}
-
-function fetchRamen(latitude, longitude) {
+function sendMessage(token, accountId, message) {
     const postdata = {
         url:
-            "https://ramendb.supleks.jp/search?lat=" +
-            latitude +
-            "&lng=" +
-            longitude +
-            "&around=1&order=distance",
+            "https://apis.worksmobile.com/" + APIID + "/message/sendMessage/v2",
         headers: {
-            "User-Agent":
-                "Mozilla / 5.0(iPhone; CPU iPhone OS 11_0 like Mac OS X) > > AppleWebKit / 604.1.38(KHTML, like Gecko) Version/ 11.0 Mobile/15A372 Safari/604.1"
+            "Content-Type": "application/json;charset=UTF-8",
+            consumerKey: CONSUMERKEY,
+            Authorization: "Bearer " + token
+        },
+        json: {
+            botNo: Number(BOTNO),
+            accountId: accountId,
+            content: {
+                type: "text",
+                text: message
+            }
         }
     };
     request.post(postdata, (error, response, body) => {
@@ -134,5 +116,63 @@ function fetchRamen(latitude, longitude) {
         }
         console.log(body);
     });
-    console.log(postdata.url);
+}
+
+function fetchNearestRamens(toekn, accountId, latitude, longtitude) {
+    const fetch =
+        "https://ramendb.supleks.jp/search?lat=" +
+        latitude +
+        "&lng=" +
+        longtitude +
+        "&around=1&order=distance";
+    const list = [];
+    client
+        .fetch(fetch)
+        .then(result => {
+            result.$("a").each(function(idx) {
+                var $url = result.$(this).attr("href");
+                if ($url.startsWith("/s/")) {
+                    console.log($url);
+                    list.push("https://ramendb.supleks.jp" + $url);
+                }
+            });
+        })
+        .catch(err => {
+            console.log(err);
+        })
+        .finally(() => {
+            console.log("終了");
+            fetchRamens(toekn, accountId, list);
+        });
+}
+
+function fetchRamenDetail(toekn, accountId, url) {
+    console.log(url);
+    client.fetch(url).then(result => {
+        const re = new RegExp("<title>.*?</title>", "g");
+        // console.log(re.exec(result.body));
+        Enumerable.from(result.body.match(re)).first(tag => {
+            const title = tag
+                .replace("<title>", "")
+                .replace("</title>", "")
+                .replace(" | ラーメンデータベース", "");
+            const message = title + "\n" + url;
+            return sendMessage(toekn, accountId, message);
+        });
+    });
+}
+
+function fetchRamens(toekn, accountId, urls) {
+    console.log(urls);
+    return Enumerable.from(urls)
+        .take(5)
+        .forEach(url => {
+            return fetchRamenDetail(toekn, accountId, url);
+        })
+        .catch(err => {
+            console.log(err);
+        })
+        .finally(() => {
+            console.log("終了");
+        });
 }
