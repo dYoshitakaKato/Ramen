@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/dYoshitakaKato/RamenBot/issues"
   },
-  "homepage": "https://github.com/dYoshitakaKato/RamenBot#readme"
+  "homepage": "https://github.com/dYoshitakaKato/RamenBot#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
