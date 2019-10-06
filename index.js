@@ -30,8 +30,8 @@ server.get("/", (req, res) => {
 server.post("/callback", (req, res) => {
     res.sendStatus(200);
 
-    const latitude = req.body.content.type.latitude;
-    const longitude = req.body.content.type.longitude;
+    const latitude = req.body.content.latitude;
+    const longitude = req.body.content.longitude;
     const roomId = req.body.source.roomId;
     const accountId = req.body.source.accountId;
 
