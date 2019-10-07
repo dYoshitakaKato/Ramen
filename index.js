@@ -151,27 +151,19 @@ function fetchRamenDetail(toekn, accountId, url) {
     client.fetch(url).then(result => {
         const regTitle = new RegExp("<title>.*?</title>", "g");
         // console.log(re.exec(result.body));
-        const title = Enumerable.from(result.body.match(regTitle)).first(
-            tag => {
-                return tag
-                    .replace("<title>", "")
-                    .replace("</title>", "")
-                    .replace(" | ラーメンデータベース", "");
-                //<div id="point">0.00</div>
-            }
-        );
+        const title = Enumerable.from(result.body.match(regTitle))
+            .first()
+            .replace("<title>", "")
+            .replace("</title>", "")
+            .replace(" | ラーメンデータベース", "");
 
         const regPoint = new RegExp('<div id="point">.*?</div>', "g");
         // console.log(re.exec(result.body));
-        const point = Enumerable.from(result.body.match(regPoint)).first(
-            tag => {
-                return (
-                    tag.replace('<div id="point">', "").replace("</div>", "") +
-                    "ポイント"
-                );
-                //<div id="point">0.00</div>
-            }
-        );
+        const point =
+            Enumerable.from(result.body.match(regPoint))
+                .first()
+                .replace('<div id="point">', "")
+                .replace("</div>", "") + "ポイント";
         const message = title + "\n" + point + "\n" + url;
         return sendMessage(toekn, accountId, message);
     });
