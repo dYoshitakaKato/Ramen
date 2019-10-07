@@ -149,16 +149,31 @@ function fetchNearestRamens(toekn, accountId, latitude, longtitude) {
 function fetchRamenDetail(toekn, accountId, url) {
     console.log(url);
     client.fetch(url).then(result => {
-        const re = new RegExp("<title>.*?</title>", "g");
+        const regTitle = new RegExp("<title>.*?</title>", "g");
         // console.log(re.exec(result.body));
-        Enumerable.from(result.body.match(re)).first(tag => {
-            const title = tag
-                .replace("<title>", "")
-                .replace("</title>", "")
-                .replace(" | ラーメンデータベース", "");
-            const message = title + "\n" + url;
-            return sendMessage(toekn, accountId, message);
-        });
+        const titles = Enumerable.from(result.body.match(regTitle)).select(
+            tag => {
+                return tag
+                    .replace("<title>", "")
+                    .replace("</title>", "")
+                    .replace(" | ラーメンデータベース", "");
+                //<div id="point">0.00</div>
+            }
+        );
+
+        const regPoint = new RegExp('<div id="point">.*?</div>', "g");
+        // console.log(re.exec(result.body));
+        const points = Enumerable.from(result.body.match(regPoint)).select(
+            tag => {
+                return (
+                    tag.replace('<div id="point">', "").replace("</div>", "") +
+                    "ポイント"
+                );
+                //<div id="point">0.00</div>
+            }
+        );
+        const message = titles.first + "\n" + points.first + "\n" + url;
+        return sendMessage(toekn, accountId, message);
     });
 }
 
