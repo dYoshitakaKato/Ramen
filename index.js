@@ -163,7 +163,7 @@ function fetchRamenDetail(toekn, accountId, url) {
             Enumerable.from(result.body.match(regPoint))
                 .first()
                 .replace('<div id="point">', "")
-                .replace("</div>", "") + "ポイント";
+                .replace("</div>", "") + "⭐";
         const message = title + "\n" + point + "\n" + url;
         return sendMessage(toekn, accountId, message);
     });
