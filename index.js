@@ -151,7 +151,7 @@ function fetchRamenDetail(toekn, accountId, url) {
     client.fetch(url).then(result => {
         const regTitle = new RegExp("<title>.*?</title>", "g");
         // console.log(re.exec(result.body));
-        const titles = Enumerable.from(result.body.match(regTitle)).select(
+        const title = Enumerable.from(result.body.match(regTitle)).first(
             tag => {
                 return tag
                     .replace("<title>", "")
@@ -163,7 +163,7 @@ function fetchRamenDetail(toekn, accountId, url) {
 
         const regPoint = new RegExp('<div id="point">.*?</div>', "g");
         // console.log(re.exec(result.body));
-        const points = Enumerable.from(result.body.match(regPoint)).select(
+        const point = Enumerable.from(result.body.match(regPoint)).first(
             tag => {
                 return (
                     tag.replace('<div id="point">', "").replace("</div>", "") +
@@ -172,7 +172,7 @@ function fetchRamenDetail(toekn, accountId, url) {
                 //<div id="point">0.00</div>
             }
         );
-        const message = titles.first + "\n" + points.first + "\n" + url;
+        const message = title + "\n" + point + "\n" + url;
         return sendMessage(toekn, accountId, message);
     });
 }
